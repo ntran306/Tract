@@ -1,0 +1,36 @@
+/* Tract design tokens — docs/FRONTEND.md is the reference.
+   Light: beige paper + professional sage green. Dark: deep green-charcoal. */
+
+:root {
+  --bg: #f6f2e8;
+  --surface: #fcfaf4;
+  --surface-raised: #ffffff;
+  --border: #e3dcc9;
+  --text: #1e2921;
+  --text-muted: #5f6b60;
+  --primary: #4c7a5e;
+  --primary-strong: #3b6149;
+  --primary-soft: #e7efe7;
+  --primary-contrast: #ffffff;
+  --positive: #3e7d51;
+  --negative: #b4533a;
+  --warning: #b98a2f;
+  --focus-ring: #4c7a5e;
+}
+
+[data-theme='dark'] {
+  --bg: #121813;
+  --surface: #1a211b;
+  --surface-raised: #212a22;
+  --border: #2e382f;
+  --text: #eae7da;
+  --text-muted: #9aa69b;
+  --primary: #7cae8c;
+  --primary-strong: #93c2a2;
+  --primary-soft: #24352a;
+  --primary-contrast: #10160f;
+  --positive: #6fb884;
+  --negative: #d08067;
+  --warning: #cfa35c;
+  --focus-ring: #7cae8c;
+}
