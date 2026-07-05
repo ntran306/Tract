@@ -10,6 +10,8 @@ and savings opportunities — with in-app messaging and an AI assistant.
 - [Database schema](docs/DATABASE.md) — PostgreSQL/Supabase tables, enums, RLS
 - [Frontend plan](docs/FRONTEND.md) — routes, components, design system (green/beige + dark mode)
 - [Roadmap](docs/ROADMAP.md) — milestones M0–M4, v1.5 marketplace, premium prototype
+- [Playbook](docs/PLAYBOOK.md) — change pipeline, per-phase user actions, ops habits
+- [Backlog](docs/BACKLOG.md) — prioritized future work: requests board, media, payments
 - [Decision log](docs/DECISIONS.md) — why things are the way they are
 
 ## Stack
