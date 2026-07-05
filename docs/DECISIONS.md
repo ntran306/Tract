@@ -1,0 +1,50 @@
+# Tract — Decision Log
+
+Short records of decisions with reasoning, so future sessions don't re-litigate.
+Newest last.
+
+**D1 — No ECC / third-party skill packs.** Investigated "Everything Claude Code";
+star growth implausible for its age with near-zero issue activity, copycat repo
+swarm, auto-executing hooks. Only Anthropic's official `anthropics/skills` repo and
+custom-written skills are used, project-scoped under `.claude/skills/`.
+
+**D2 — License: source-visible, not open source (pending file).** Goal is "people
+can see it, not copy it." Standard OSS licenses all grant copying. Choice narrowed
+to explicit all-rights-reserved notice or FSL. No LICENSE committed yet — do this
+before publicizing the repo.
+
+**D3 — No scraping; free-data-or-manual.** Zillow's API is dead to the public and
+its ToS bans scraping. Data strategy: FHFA HPI (free CSV) + HUD FMR (free API) for
+area context, manual entry for everything else, RentCast (50 free calls/mo)
+reserved for the premium prototype.
+
+**D4 — Monorepo, not three repos.** (User initially wanted frontend/backend/workers
+as separate repositories.) Solo project; one CI, atomic cross-cutting PRs, no
+version drift. `frontend/`, `backend/`, `workers/` are top-level folders instead.
+
+**D5 — Portfolio-first; marketplace at v1.5.** A two-sided marketplace with zero
+users is dead weight; portfolio tracking is useful to one user on day one. Listings
+and inquiry-conversation schema designed now so v1.5 is additive, not a migration.
+
+**D6 — Supabase + FastAPI hybrid.** Supabase free tier supplies Postgres, auth
+(never hand-rolled), and managed realtime — which matters because free FastAPI
+hosting (Render) sleeps, making self-hosted WebSockets flaky. FastAPI owns all
+writes, business logic, analytics, and the AI agent. Frontend touches Supabase
+directly only for auth and realtime message reads.
+
+**D7 — "Workers handle DB stuff" corrected.** API owns request-time DB access;
+workers own scheduled background jobs (FHFA/HUD refreshes, email mirroring,
+digests), run free via GitHub Actions cron. Workers never serve requests.
+
+**D8 — Email = transactional + mirroring, not a client.** Resend free tier.
+Password resets (Supabase built-in), unread-message mirroring, opt-in monthly
+digest. No inbox/compose/receive — building an email client was ruled out for v1.
+
+**D9 — AI agent is pluggable because it isn't free.** No free Anthropic API tier.
+StubProvider (default): deterministic answers to structured portfolio questions by
+calling the analytics service — $0. ClaudeProvider (Haiku + tool use over the same
+analytics functions) enabled only when a key is configured, behind a feature flag.
+
+**D10 — Money is numeric(12,2), USD, manual-entry-as-contract.** No floats, no
+multi-currency in v1. The app is honest about what it can't fetch legally/freely:
+users type it in, and the UI treats good manual entry as a feature, not a gap.
