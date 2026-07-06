@@ -122,6 +122,18 @@ index.html reads localStorage before paint.
 - Density: generous whitespace on marketing/About; comfortable-compact in Manage
   (this is a tool, not a brochure).
 
+### Iconography
+
+Icons come from **lucide-react** (16–18 px, default stroke). Rules:
+- Buttons lead with an icon wherever it aids scanning — icon **with** words for
+  actions ("＋ Add property", "→ Start tracking"), icon-only where the meaning is
+  universal (sun/moon theme toggle, ✕ close, bell).
+- Every icon-only button carries `aria-label` and `title` — no unlabeled mystery
+  buttons, ever.
+- Primary/destructive CTAs always keep words; an icon alone never guards an
+  irreversible action.
+- One icon per button; icons inherit `currentColor` so they theme for free.
+
 ### Motion — "clean, simple, minimal"
 
 - Standard transition: 160ms ease-out, opacity/transform only. Dock slide-up: 220ms

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowRight, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useSession } from '../features/auth/useSession'
 import { useMe } from '../features/auth/useMe'
 import { Button } from '../components/ui/Button'
@@ -21,10 +22,16 @@ function SignedOutHome() {
         </p>
         <div className="mt-8 flex gap-3">
           <Link to="/auth">
-            <Button>Start tracking — free</Button>
+            <Button>
+              Start tracking — free
+              <ArrowRight size={16} />
+            </Button>
           </Link>
           <Link to="/about">
-            <Button variant="secondary">How Tract works</Button>
+            <Button variant="secondary">
+              <BookOpen size={16} />
+              How Tract works
+            </Button>
           </Link>
         </div>
       </section>
@@ -58,7 +65,10 @@ function SignedInHome() {
       </div>
       <div className="mt-6">
         <Link to="/manage">
-          <Button variant="secondary">Open Manage</Button>
+          <Button variant="secondary">
+            <LayoutDashboard size={16} />
+            Open Manage
+          </Button>
         </Link>
       </div>
     </main>

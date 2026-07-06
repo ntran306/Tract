@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { LogIn, UserPlus } from 'lucide-react'
 import { supabase, supabaseConfigured } from '../../lib/supabase'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
@@ -82,6 +83,7 @@ export function AuthPage() {
           />
           {error && <p className="text-sm text-negative">{error}</p>}
           <Button type="submit" disabled={busy}>
+            {mode === 'signin' ? <LogIn size={16} /> : <UserPlus size={16} />}
             {mode === 'signin' ? 'Sign in' : 'Sign up'}
           </Button>
         </form>

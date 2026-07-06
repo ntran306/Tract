@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { LogIn, LogOut, Moon, Settings, Sun, User } from 'lucide-react'
 import { useSession } from '../../features/auth/useSession'
 import { useMe } from '../../features/auth/useMe'
 import { useTheme } from '../../app/theme'
@@ -12,6 +13,10 @@ function navClass({ isActive }: { isActive: boolean }) {
   }`
 }
 
+const menuItemClass =
+  'flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text outline-none ' +
+  'hover:bg-primary-soft focus-visible:bg-primary-soft'
+
 export function Header() {
   const { session } = useSession()
   const { data: me } = useMe()
@@ -22,6 +27,8 @@ export function Header() {
     await supabase.auth.signOut()
     navigate('/')
   }
+
+  const nextTheme = resolved === 'dark' ? 'light' : 'dark'
 
   return (
     <header className="border-b border-border bg-surface">
@@ -46,11 +53,12 @@ export function Header() {
 
         <div className="ml-auto flex items-center gap-2">
           <button
-            onClick={() => setChoice(resolved === 'dark' ? 'light' : 'dark')}
-            className="rounded-lg px-2 py-1.5 text-sm text-text-muted transition-colors duration-150 hover:text-text"
-            title="Toggle theme"
+            onClick={() => setChoice(nextTheme)}
+            className="rounded-lg p-2 text-text-muted transition-colors duration-150 hover:bg-primary-soft hover:text-text"
+            aria-label={`Switch to ${nextTheme} theme`}
+            title={`Switch to ${nextTheme} theme`}
           >
-            {resolved === 'dark' ? 'Light' : 'Dark'}
+            {resolved === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
           </button>
 
           {session ? (
@@ -58,6 +66,7 @@ export function Header() {
               <DropdownMenu.Trigger asChild>
                 <button
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-contrast"
+                  aria-label="Account menu"
                   title="Account"
                 >
                   {(me?.display_name ?? '?').slice(0, 1).toUpperCase()}
@@ -67,24 +76,24 @@ export function Header() {
                 <DropdownMenu.Content
                   align="end"
                   sideOffset={6}
-                  className="min-w-40 rounded-[10px] border border-border bg-surface-raised p-1 shadow-sm"
+                  className="min-w-44 rounded-[10px] border border-border bg-surface-raised p-1 shadow-sm data-[state=open]:animate-[pop-in_150ms_ease-out]"
                 >
                   <DropdownMenu.Item asChild>
-                    <Link to="/profile" className="block rounded-lg px-3 py-2 text-sm text-text outline-none hover:bg-primary-soft focus-visible:bg-primary-soft">
+                    <Link to="/profile" className={menuItemClass}>
+                      <User size={16} />
                       Profile
                     </Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item asChild>
-                    <Link to="/settings" className="block rounded-lg px-3 py-2 text-sm text-text outline-none hover:bg-primary-soft focus-visible:bg-primary-soft">
+                    <Link to="/settings" className={menuItemClass}>
+                      <Settings size={16} />
                       Settings
                     </Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Separator className="my-1 h-px bg-border" />
                   <DropdownMenu.Item asChild>
-                    <button
-                      onClick={signOut}
-                      className="block w-full rounded-lg px-3 py-2 text-left text-sm text-text outline-none hover:bg-primary-soft focus-visible:bg-primary-soft"
-                    >
+                    <button onClick={signOut} className={`${menuItemClass} w-full text-left`}>
+                      <LogOut size={16} />
                       Sign out
                     </button>
                   </DropdownMenu.Item>
@@ -93,6 +102,7 @@ export function Header() {
             </DropdownMenu.Root>
           ) : (
             <Button variant="secondary" onClick={() => navigate('/auth')}>
+              <LogIn size={16} />
               Sign in
             </Button>
           )}

@@ -47,6 +47,18 @@ h3 {
   outline-offset: 2px;
 }
 
+/* Simple entrance for popovers/dropdowns — one of the few sanctioned animations. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Minimal-motion contract: default transitions are short; reduced motion kills them. */
 @media (prefers-reduced-motion: reduce) {
   *,
