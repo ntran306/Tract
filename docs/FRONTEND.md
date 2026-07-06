@@ -138,6 +138,9 @@ Icons come from **lucide-react** (16–18 px, default stroke). Rules:
 
 - Standard transition: 160ms ease-out, opacity/transform only. Dock slide-up: 220ms
   `cubic-bezier(0.2, 0, 0, 1)`.
+- Header nav selection: a 2px underline that grows from the center on select
+  (220ms) and fades out in place on deselect (180ms) — no pill backgrounds in the
+  header; pills stay in the Manage sidebar.
 - Charts animate once on mount (400ms), never on data refetch.
 - No scroll-triggered animation, no parallax, no skeleton shimmer loops (static
   skeletons are fine).

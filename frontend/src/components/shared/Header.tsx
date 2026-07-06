@@ -8,8 +8,8 @@ import { supabase } from '../../lib/supabase'
 import { Button } from '../ui/Button'
 
 function navClass({ isActive }: { isActive: boolean }) {
-  return `rounded-lg px-3 py-1.5 text-sm transition-colors duration-150 ${
-    isActive ? 'bg-primary-soft text-text font-medium' : 'text-text-muted hover:text-text'
+  return `nav-link px-3 py-1.5 text-sm transition-colors duration-150 ${
+    isActive ? 'text-text font-medium' : 'text-text-muted hover:text-text'
   }`
 }
 

@@ -47,6 +47,39 @@ h3 {
   outline-offset: 2px;
 }
 
+/* Header nav underline: grows from the center on select, fades out on deselect.
+   NavLink sets aria-current="page" on the active tab — no JS needed. */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem; /* aligns with the link's px-3 padding */
+  right: 0.75rem;
+  bottom: 1px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0;
+  /* deselect: fade in place, then snap the scale back after the fade */
+  transition:
+    opacity 180ms ease-out,
+    transform 0ms 180ms;
+}
+
+.nav-link[aria-current='page']::after {
+  transform: scaleX(1);
+  opacity: 1;
+  /* select: appear instantly, grow from the center */
+  transition:
+    transform 220ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 0ms;
+}
+
 /* Simple entrance for popovers/dropdowns — one of the few sanctioned animations. */
 @keyframes pop-in {
   from {
