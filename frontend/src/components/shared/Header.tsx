@@ -46,9 +46,11 @@ export function Header() {
           <NavLink to="/" className={navClass} end>
             Home
           </NavLink>
-          <NavLink to="/manage" className={navClass}>
-            Manage
-          </NavLink>
+          {session && (
+            <NavLink to="/manage" className={navClass}>
+              Manage
+            </NavLink>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
