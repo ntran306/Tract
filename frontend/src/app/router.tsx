@@ -5,6 +5,7 @@ import { RequireAuth } from '../features/auth/RequireAuth'
 import { AuthPage } from '../features/auth/AuthPage'
 import { SummaryPage } from '../features/portfolio/SummaryPage'
 import { OwnedPage } from '../features/portfolio/OwnedPage'
+import { PropertyDetailPage } from '../features/portfolio/PropertyDetailPage'
 import { HomePage } from '../pages/HomePage'
 import { AboutPage } from '../pages/AboutPage'
 import { StubPage } from '../pages/StubPage'
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
               { index: true, element: <Navigate to="/manage/summary" replace /> },
               { path: 'summary', element: <SummaryPage /> },
               { path: 'owned', element: <OwnedPage /> },
+              { path: 'owned/:id', element: <PropertyDetailPage /> },
             ],
           },
           { path: '/profile', element: <StubPage title="Profile" milestone="M4" /> },

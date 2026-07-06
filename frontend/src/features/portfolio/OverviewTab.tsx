@@ -1,0 +1,162 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Plus, Trash2 } from 'lucide-react'
+import { Button } from '../../components/ui/Button'
+import { Card } from '../../components/ui/Card'
+import { Input } from '../../components/ui/Input'
+import { MoneyText } from '../../components/shared/MoneyText'
+import { dateShort } from '../../lib/format'
+import type { Property } from '../../types/api'
+import { SOURCE_LABELS } from './kinds'
+import { useAddValuation, useDeleteProperty, useValuations } from './queries'
+
+function Fact({ label, value }: { label: string; value: string | number | null }) {
+  if (value === null || value === '' || value === undefined) return null
+  return (
+    <div>
+      <p className="text-xs text-text-muted">{label}</p>
+      <p className="text-sm text-text">{value}</p>
+    </div>
+  )
+}
+
+export function OverviewTab({ property }: { property: Property }) {
+  const { data: valuations } = useValuations(property.id)
+  const addValuation = useAddValuation(property.id)
+  const deleteProperty = useDeleteProperty()
+  const navigate = useNavigate()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  async function submitValuation(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const f = new FormData(e.currentTarget)
+    await addValuation.mutateAsync({
+      value: f.get('value') as string,
+      valued_at: f.get('valued_at') as string,
+      note: (f.get('note') as string) || undefined,
+    })
+    e.currentTarget?.reset?.()
+  }
+
+  async function handleDelete() {
+    await deleteProperty.mutateAsync(property.id)
+    navigate('/manage/owned')
+  }
+
+  const address = [property.address_line1, property.city, property.state, property.zip_code]
+    .filter(Boolean)
+    .join(', ')
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card>
+        <h2 className="mb-3 font-display text-base font-semibold">Facts</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Fact label="Address" value={address || null} />
+          <Fact label="Beds" value={property.beds} />
+          <Fact label="Baths" value={property.baths} />
+          <Fact label="Sqft" value={property.sqft?.toLocaleString() ?? null} />
+          <Fact
+            label="Purchased"
+            value={
+              property.purchase_date
+                ? `${dateShort(property.purchase_date)}${property.purchase_price ? '' : ''}`
+                : null
+            }
+          />
+          <Fact
+            label="Purchase price"
+            value={property.purchase_price ? `$${Number(property.purchase_price).toLocaleString()}` : null}
+          />
+          <Fact
+            label="Loan balance"
+            value={property.loan_balance ? `$${Number(property.loan_balance).toLocaleString()}` : null}
+          />
+          <Fact
+            label="Monthly payment"
+            value={property.monthly_payment ? `$${Number(property.monthly_payment).toLocaleString()}` : null}
+          />
+        </div>
+        {!address && (
+          <p className="mt-3 text-xs text-text-muted">
+            Add details anytime — more facts unlock more analytics in M2.
+          </p>
+        )}
+      </Card>
+
+      <Card>
+        <h2 className="mb-3 font-display text-base font-semibold">Value history</h2>
+
+        <form onSubmit={submitValuation} className="mb-4 flex items-end gap-2">
+          <div className="flex-1">
+            <label htmlFor="val-value" className="text-xs text-text-muted">
+              Value ($)
+            </label>
+            <Input id="val-value" name="value" type="number" min={1} step="0.01" required />
+          </div>
+          <div className="flex-1">
+            <label htmlFor="val-date" className="text-xs text-text-muted">
+              As of
+            </label>
+            <Input
+              id="val-date"
+              name="valued_at"
+              type="date"
+              required
+              defaultValue={new Date().toISOString().slice(0, 10)}
+            />
+          </div>
+          <Button type="submit" variant="secondary" disabled={addValuation.isPending}>
+            <Plus size={16} />
+            Record
+          </Button>
+        </form>
+
+        {!valuations || valuations.length === 0 ? (
+          <p className="text-sm text-text-muted">
+            No values yet — record what you think it's worth today.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {valuations.map((v) => (
+              <li key={v.id} className="flex items-baseline justify-between gap-3 text-sm">
+                <MoneyText amount={v.value} className="font-medium" />
+                <span className="text-xs text-text-muted">
+                  {dateShort(v.valued_at)} · {SOURCE_LABELS[v.source]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card className="lg:col-span-2">
+        <h2 className="mb-2 font-display text-base font-semibold text-negative">Danger zone</h2>
+        {confirmDelete ? (
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-text-muted">
+              This permanently deletes the property and all its transactions and value history.
+            </p>
+            <Button
+              variant="secondary"
+              className="border-negative text-negative hover:bg-negative/10"
+              onClick={handleDelete}
+              disabled={deleteProperty.isPending}
+            >
+              <Trash2 size={16} />
+              Delete permanently
+            </Button>
+            <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <Button variant="ghost" className="text-negative" onClick={() => setConfirmDelete(true)}>
+            Delete this property…
+          </Button>
+        )}
+      </Card>
+    </div>
+  )
+}

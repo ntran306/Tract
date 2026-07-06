@@ -29,7 +29,7 @@ class PropertyValuation(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     property_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("properties.id", ondelete="CASCADE")
@@ -55,7 +55,7 @@ class Transaction(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     property_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("properties.id", ondelete="CASCADE")

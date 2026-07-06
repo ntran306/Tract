@@ -27,7 +27,7 @@ class Property(Base):
     __table_args__ = (Index("ix_properties_owner_kind", "owner_id", "kind"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     owner_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("profiles.id", ondelete="CASCADE")
@@ -73,7 +73,7 @@ class Lease(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     property_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("properties.id", ondelete="CASCADE")

@@ -15,7 +15,7 @@ class MarketFMR(Base):
     __table_args__ = (UniqueConstraint("year", "area_code", "bedrooms"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     year: Mapped[int] = mapped_column(SmallInteger)
     area_code: Mapped[str] = mapped_column(Text)  # HUD area / county FIPS
@@ -32,7 +32,7 @@ class MarketHPI(Base):
     __table_args__ = (UniqueConstraint("level", "region_code", "period"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     level: Mapped[str] = mapped_column(Text)  # 'state' | 'msa'
     region_code: Mapped[str] = mapped_column(Text)

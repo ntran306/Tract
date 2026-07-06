@@ -12,7 +12,7 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     kind: Mapped[ConversationKind] = mapped_column(
         db_enum(ConversationKind, "conversation_kind")
@@ -50,7 +50,7 @@ class Message(Base):
     __table_args__ = (Index("ix_messages_conversation_created", "conversation_id", "created_at"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     conversation_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("conversations.id", ondelete="CASCADE")
@@ -79,7 +79,7 @@ class Notification(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, server_default=text("gen_random_uuid()")
+        primary_key=True, default=uuid.uuid4, server_default=text("gen_random_uuid()")
     )
     profile_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("profiles.id", ondelete="CASCADE")
