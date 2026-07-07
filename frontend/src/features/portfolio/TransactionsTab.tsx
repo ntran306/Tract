@@ -6,7 +6,7 @@ import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import { MoneyText } from '../../components/shared/MoneyText'
-import { dateShort } from '../../lib/format'
+import { dateShort, todayLocal } from '../../lib/format'
 import type { Transaction, TxnCategory, TxnKind } from '../../types/api'
 import { CATEGORY_LABELS, categoriesFor } from './kinds'
 import { useCreateTransaction, useDeleteTransaction, useTransactions } from './queries'
@@ -39,7 +39,7 @@ export function TransactionsTab({ propertyId }: { propertyId: string }) {
 
   /** One-click "same thing, this month" — the honest v1 of recurring. */
   async function repeat(txn: Transaction) {
-    const today = new Date().toISOString().slice(0, 10)
+    const today = todayLocal()
     await createTxn.mutateAsync({
       property_id: propertyId,
       kind: txn.kind,
@@ -96,7 +96,7 @@ export function TransactionsTab({ propertyId }: { propertyId: string }) {
               name="occurred_on"
               type="date"
               required
-              defaultValue={new Date().toISOString().slice(0, 10)}
+              defaultValue={todayLocal()}
               className="w-40"
             />
           </div>

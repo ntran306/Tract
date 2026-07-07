@@ -1,5 +1,5 @@
 import * as Tabs from '@radix-ui/react-tabs'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ArrowLeftRight, FileText, Info } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from '../../components/shared/EmptyState'
 import { KIND_META } from './kinds'
@@ -9,7 +9,7 @@ import { LeaseTab } from './LeaseTab'
 import { useProperty } from './queries'
 
 const tabTrigger =
-  'nav-link px-3 py-2 text-sm text-text-muted transition-colors duration-150 ' +
+  'nav-link flex items-center gap-1.5 px-3 py-2 text-sm text-text-muted transition-colors duration-150 ' +
   'hover:text-text data-[state=active]:text-text data-[state=active]:font-medium'
 
 export function PropertyDetailPage() {
@@ -56,13 +56,16 @@ export function PropertyDetailPage() {
       <Tabs.Root defaultValue="overview">
         <Tabs.List className="mb-5 flex gap-1 border-b border-border">
           <Tabs.Trigger value="overview" className={tabTrigger}>
+            <Info size={15} />
             Overview
           </Tabs.Trigger>
           <Tabs.Trigger value="transactions" className={tabTrigger}>
+            <ArrowLeftRight size={15} />
             Transactions
           </Tabs.Trigger>
           {property.kind === 'rental' && (
             <Tabs.Trigger value="lease" className={tabTrigger}>
+              <FileText size={15} />
               Lease
             </Tabs.Trigger>
           )}

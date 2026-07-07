@@ -6,9 +6,10 @@ import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { MoneyText } from '../../components/shared/MoneyText'
-import { dateShort } from '../../lib/format'
+import { dateShort, todayLocal } from '../../lib/format'
 import type { Property } from '../../types/api'
 import { SOURCE_LABELS } from './kinds'
+import { ValueChart } from './ValueChart'
 import { useAddValuation, useDeleteProperty, useValuations } from './queries'
 
 function Fact({ label, value }: { label: string; value: string | number | null }) {
@@ -88,6 +89,8 @@ export function OverviewTab({ property }: { property: Property }) {
       <Card>
         <h2 className="mb-3 font-display text-base font-semibold">Value history</h2>
 
+        {valuations && <ValueChart valuations={valuations} />}
+
         <form onSubmit={submitValuation} className="mb-4 flex items-end gap-2">
           <div className="flex-1">
             <label htmlFor="val-value" className="text-xs text-text-muted">
@@ -104,7 +107,7 @@ export function OverviewTab({ property }: { property: Property }) {
               name="valued_at"
               type="date"
               required
-              defaultValue={new Date().toISOString().slice(0, 10)}
+              defaultValue={todayLocal()}
             />
           </div>
           <Button type="submit" variant="secondary" disabled={addValuation.isPending}>

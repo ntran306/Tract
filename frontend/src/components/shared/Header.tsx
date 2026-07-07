@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { LogIn, LogOut, Moon, Settings, Sun, User } from 'lucide-react'
+import { House, LayoutDashboard, LogIn, LogOut, Moon, Settings, Sun, User } from 'lucide-react'
 import { useSession } from '../../features/auth/useSession'
 import { useMe } from '../../features/auth/useMe'
 import { useTheme } from '../../app/theme'
@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase'
 import { Button } from '../ui/Button'
 
 function navClass({ isActive }: { isActive: boolean }) {
-  return `nav-link px-3 py-1.5 text-sm transition-colors duration-150 ${
+  return `nav-link flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors duration-150 ${
     isActive ? 'text-text font-medium' : 'text-text-muted hover:text-text'
   }`
 }
@@ -44,10 +44,12 @@ export function Header() {
 
         <nav className="flex items-center gap-1">
           <NavLink to="/" className={navClass} end>
+            <House size={15} />
             Home
           </NavLink>
           {session && (
             <NavLink to="/manage" className={navClass}>
+              <LayoutDashboard size={15} />
               Manage
             </NavLink>
           )}

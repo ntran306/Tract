@@ -25,6 +25,14 @@ export function pct(value: number): string {
   return `${value.toFixed(1)}%`
 }
 
+/** Today as YYYY-MM-DD in the user's LOCAL timezone — toISOString() is UTC and
+ *  rolls to tomorrow during evening hours in the US. */
+export function todayLocal(): string {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 export function dateShort(iso: string): string {
   // Date-only strings ("2026-07-06") must parse as LOCAL dates — new Date(iso)
   // would treat them as UTC midnight and render the previous day in the US.

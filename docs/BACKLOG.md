@@ -37,6 +37,46 @@ owners respond, opening a negotiation conversation.
   even with few listings — a requests board is useful at 10 users in a way an
   empty listings grid is not.
 
+### NEW — Map-based search (browse on a map)
+Listings and requests get pins on an interactive map in the browse/search tab;
+"search this area" filters to the visible viewport.
+
+- **Map engine: Leaflet + OpenStreetMap tiles — not Google Maps — for v1.**
+  Honest comparison:
+  - *Leaflet + OSM*: $0, no API key, no credit card, no usage caps at our scale
+    (attribution line required). When traffic outgrows OSM's public tile policy,
+    swap the tile URL for a free-tier provider (MapTiler/Protomaps) — one line.
+  - *Google Maps JS API*: requires a **billing account with a credit card on
+    file** even for free usage; free tier is ~10K map loads/month (post-2025
+    per-SKU pricing), overage bills automatically. Fine later if we want
+    Google's look or Street View — wrong default for a free-tier project.
+- **Geocoding (address → lat/lon):** US Census Geocoder — free, no key, US-only,
+  government-run. Geocode **once per property/listing at save time** and store
+  `lat`/`lon` columns (new migration on `properties`); never geocode on render.
+  Nominatim (OSM) as fallback, respecting its 1 req/sec policy.
+- **Schema impact:** `properties.lat/lon numeric`, geocoded_at timestamptz;
+  same on any future standalone listing address.
+- **API surface:** `GET /listings?bbox=` and `GET /requests?bbox=` viewport
+  filters (simple lat/lon BETWEEN — no PostGIS needed until thousands of pins).
+
+### NEW — Property photos & location imagery (the free-and-legal reality)
+There is **no free, legal API that returns a photo of an arbitrary house.**
+Zillow/Redfin/MLS photos are copyrighted — scraping them is both a ToS breach
+and a copyright problem. What actually works:
+
+1. **Owner-uploaded photos (primary).** The listing owner photographs their own
+   property — legally clean, and the v2 media pipeline (direct-to-Supabase
+   uploads, client compression, thumbnails) already covers the mechanics.
+   Listings without a photo get a tasteful map-tile card, not a broken image.
+2. **Map/satellite context (free).** A small static map crop centered on the
+   stored lat/lon via OSM-based static tiles — free location context for every
+   property, no photo required.
+3. **Street View Static API (later, optional).** ~10K free images/month but
+   requires the Google billing account, and ToS forbids caching/storing the
+   images — display-only via their URL. Premium-tier candidate, not a default.
+4. **Mapillary (free, spotty).** Crowdsourced street imagery, free API; coverage
+   too inconsistent to rely on — opportunistic enhancement only.
+
 ### Negotiation affordances (bargaining)
 Keep bargaining inside conversations, but add structure: an **offer message
 type** — amount + optional terms, with accept/decline/counter actions rendered

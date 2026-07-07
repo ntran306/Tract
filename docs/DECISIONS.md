@@ -48,3 +48,12 @@ analytics functions) enabled only when a key is configured, behind a feature fla
 **D10 — Money is numeric(12,2), USD, manual-entry-as-contract.** No floats, no
 multi-currency in v1. The app is honest about what it can't fetch legally/freely:
 users type it in, and the UI treats good manual entry as a feature, not a gap.
+
+**D11 — Maps: Leaflet + OSM, not Google; imagery: owner uploads, never scraped.**
+Google Maps requires a credit-card billing account even at free-tier usage —
+wrong default for this project; Leaflet + OpenStreetMap costs $0 with no key
+(swap tile provider later if traffic demands). Addresses geocode once at save
+time via the free US Census Geocoder into stored lat/lon. House photos come from
+owners uploading their own; listing-site photos are copyrighted and off-limits.
+Street View is a possible paid add-on later (its ToS forbids caching). Details
+in BACKLOG.md v1.5.
