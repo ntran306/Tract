@@ -14,6 +14,7 @@ from app.schemas.property import (
     ValuationCreate,
     ValuationRead,
 )
+from app.services.analytics import latest_valuations
 
 router = APIRouter()
 
@@ -28,26 +29,6 @@ def get_owned_property(
         # 404 (not 403) so property ids don't leak existence to non-owners
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Property not found")
     return prop
-
-
-def _latest_valuations(
-    db: Session, property_ids: list[uuid.UUID]
-) -> dict[uuid.UUID, PropertyValuation]:
-    if not property_ids:
-        return {}
-    rows = db.execute(
-        select(PropertyValuation)
-        .where(PropertyValuation.property_id.in_(property_ids))
-        .order_by(
-            PropertyValuation.property_id,
-            PropertyValuation.valued_at.desc(),
-            PropertyValuation.created_at.desc(),
-        )
-    ).scalars()
-    latest: dict[uuid.UUID, PropertyValuation] = {}
-    for v in rows:  # first row per property is the latest
-        latest.setdefault(v.property_id, v)
-    return latest
 
 
 def _to_read(prop: Property, valuation: PropertyValuation | None) -> PropertyRead:
@@ -68,7 +49,7 @@ def list_properties(
     if kind is not None:
         q = q.where(Property.kind == kind)
     props = list(db.execute(q).scalars())
-    latest = _latest_valuations(db, [p.id for p in props])
+    latest = latest_valuations(db, [p.id for p in props])
     return [_to_read(p, latest.get(p.id)) for p in props]
 
 
@@ -116,7 +97,7 @@ def get_property(
     prop: Annotated[Property, Depends(get_owned_property)],
     db: Annotated[Session, Depends(get_db)],
 ) -> PropertyRead:
-    latest = _latest_valuations(db, [prop.id])
+    latest = latest_valuations(db, [prop.id])
     return _to_read(prop, latest.get(prop.id))
 
 
@@ -130,7 +111,7 @@ def update_property(
         setattr(prop, field, value)
     db.commit()
     db.refresh(prop)
-    latest = _latest_valuations(db, [prop.id])
+    latest = latest_valuations(db, [prop.id])
     return _to_read(prop, latest.get(prop.id))
 
 

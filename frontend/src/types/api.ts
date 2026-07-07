@@ -137,3 +137,31 @@ export interface LeaseUpsertPayload {
   end_date?: string
   notes?: string
 }
+
+export interface MonthCashFlow {
+  month: string
+  income: string
+  expense: string
+  net: string
+}
+
+export interface PortfolioPropertyRow {
+  id: string
+  nickname: string
+  kind: PropertyKind
+  value: string | null
+  value_source: ValuationSource | null
+  cash_flow_month: string
+}
+
+export interface PortfolioSummary {
+  property_count: number
+  valued_count: number
+  total_value: string | null
+  total_equity: string | null
+  income_month: string
+  expense_month: string
+  cash_flow_month: string
+  series: MonthCashFlow[]
+  properties: PortfolioPropertyRow[]
+}

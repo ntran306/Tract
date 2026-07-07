@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useSession } from '../features/auth/useSession'
 import { useMe } from '../features/auth/useMe'
+import { usePortfolioSummary } from '../features/portfolio/queries'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
+import { MoneyText } from '../components/shared/MoneyText'
 
 function SignedOutHome() {
   return (
@@ -41,6 +43,8 @@ function SignedOutHome() {
 
 function SignedInHome() {
   const { data: me } = useMe()
+  const { data: portfolio } = usePortfolioSummary()
+  const cf = portfolio ? parseFloat(portfolio.cash_flow_month) : 0
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-display text-2xl font-semibold">
@@ -49,13 +53,29 @@ function SignedInHome() {
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <Card>
           <p className="text-sm text-text-muted">Portfolio value</p>
-          <p className="tabular mt-1 font-display text-2xl font-semibold">—</p>
-          <p className="mt-1 text-xs text-text-muted">Add a property to begin (M1)</p>
+          {portfolio?.total_value ? (
+            <MoneyText amount={portfolio.total_value} className="mt-1 block font-display text-2xl font-semibold" />
+          ) : (
+            <>
+              <p className="tabular mt-1 font-display text-2xl font-semibold">—</p>
+              <p className="mt-1 text-xs text-text-muted">Add a property to begin</p>
+            </>
+          )}
         </Card>
         <Card>
           <p className="text-sm text-text-muted">Cash flow this month</p>
-          <p className="tabular mt-1 font-display text-2xl font-semibold">—</p>
-          <p className="mt-1 text-xs text-text-muted">Analytics arrive in M2</p>
+          {portfolio && portfolio.property_count > 0 ? (
+            <MoneyText
+              amount={portfolio.cash_flow_month}
+              signedAs={cf === 0 ? undefined : cf > 0 ? 'income' : 'expense'}
+              className="mt-1 block font-display text-2xl font-semibold"
+            />
+          ) : (
+            <>
+              <p className="tabular mt-1 font-display text-2xl font-semibold">—</p>
+              <p className="mt-1 text-xs text-text-muted">Log income and expenses to see it</p>
+            </>
+          )}
         </Card>
         <Card>
           <p className="text-sm text-text-muted">Messages</p>

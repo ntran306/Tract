@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type {
+  PortfolioSummary,
   Lease,
   LeaseUpsertPayload,
   Property,
@@ -150,5 +151,13 @@ export function useDeleteLease(propertyId: string) {
   return useMutation({
     mutationFn: () => api<void>(`${BASE}/properties/${propertyId}/lease`, { method: 'DELETE' }),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['lease', propertyId] }),
+  })
+}
+
+export function usePortfolioSummary() {
+  return useQuery({
+    queryKey: ['portfolio-summary'],
+    queryFn: () => api<PortfolioSummary>(`${BASE}/analytics/portfolio`),
+    staleTime: 30_000,
   })
 }
