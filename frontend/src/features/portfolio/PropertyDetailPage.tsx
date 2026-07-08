@@ -57,16 +57,22 @@ export function PropertyDetailPage() {
         <Tabs.List className="mb-5 flex gap-1 border-b border-border">
           <Tabs.Trigger value="overview" className={tabTrigger}>
             <Info size={15} />
-            Overview
+            <span className="nav-label" data-text="Overview">
+              Overview
+            </span>
           </Tabs.Trigger>
           <Tabs.Trigger value="transactions" className={tabTrigger}>
             <ArrowLeftRight size={15} />
-            Transactions
+            <span className="nav-label" data-text="Transactions">
+              Transactions
+            </span>
           </Tabs.Trigger>
           {property.kind === 'rental' && (
             <Tabs.Trigger value="lease" className={tabTrigger}>
               <FileText size={15} />
-              Lease
+              <span className="nav-label" data-text="Lease">
+                Lease
+              </span>
             </Tabs.Trigger>
           )}
         </Tabs.List>

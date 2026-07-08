@@ -13,7 +13,10 @@ interface MoneyTextProps {
  *  rounding, and sign never conveyed by color alone. */
 export function MoneyText({ amount, exact, signedAs, className }: MoneyTextProps) {
   const n = typeof amount === 'string' ? parseFloat(amount) : amount
-  const formatted = exact ? moneyExact(n) : money(n)
+  // When we render an explicit +/− via signedAs, format the magnitude so the
+  // currency formatter's own "-" can't double up (e.g. "−-$3,085").
+  const value = signedAs ? Math.abs(n) : n
+  const formatted = exact ? moneyExact(value) : money(value)
   const sign = signedAs === 'income' ? '+' : signedAs === 'expense' ? '−' : ''
   return (
     <span

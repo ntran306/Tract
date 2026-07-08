@@ -2,13 +2,23 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.deps import get_current_user, get_db
-from app.models import Profile, Property, PropertyKind, PropertyValuation, ValuationSource
+from app.models import (
+    Profile,
+    Property,
+    PropertyImage,
+    PropertyKind,
+    PropertyValuation,
+    ValuationSource,
+)
 from app.schemas.property import (
+    ImageAttach,
     PropertyCreate,
+    PropertyImageRead,
     PropertyRead,
     PropertyUpdate,
     ValuationCreate,
@@ -17,6 +27,27 @@ from app.schemas.property import (
 from app.services.analytics import latest_valuations
 
 router = APIRouter()
+
+IMAGE_BUCKET = "property-images"
+
+
+def _image_url(storage_path: str) -> str:
+    base = get_settings().supabase_url.rstrip("/")
+    return f"{base}/storage/v1/object/public/{IMAGE_BUCKET}/{storage_path}"
+
+
+def _images_for(db: Session, property_ids: list[uuid.UUID]) -> dict[uuid.UUID, list[PropertyImage]]:
+    if not property_ids:
+        return {}
+    rows = db.execute(
+        select(PropertyImage)
+        .where(PropertyImage.property_id.in_(property_ids))
+        .order_by(PropertyImage.property_id, PropertyImage.sort_order, PropertyImage.created_at)
+    ).scalars()
+    out: dict[uuid.UUID, list[PropertyImage]] = {}
+    for img in rows:
+        out.setdefault(img.property_id, []).append(img)
+    return out
 
 
 def get_owned_property(
@@ -31,11 +62,17 @@ def get_owned_property(
     return prop
 
 
-def _to_read(prop: Property, valuation: PropertyValuation | None) -> PropertyRead:
+def _to_read(
+    prop: Property,
+    valuation: PropertyValuation | None,
+    images: list[PropertyImage] | None = None,
+) -> PropertyRead:
     out = PropertyRead.model_validate(prop)
     if valuation is not None:
         out.latest_value = valuation.value
         out.latest_value_source = valuation.source
+    if images:
+        out.images = [PropertyImageRead(id=i.id, url=_image_url(i.storage_path)) for i in images]
     return out
 
 
@@ -49,8 +86,10 @@ def list_properties(
     if kind is not None:
         q = q.where(Property.kind == kind)
     props = list(db.execute(q).scalars())
-    latest = latest_valuations(db, [p.id for p in props])
-    return [_to_read(p, latest.get(p.id)) for p in props]
+    ids = [p.id for p in props]
+    latest = latest_valuations(db, ids)
+    images = _images_for(db, ids)
+    return [_to_read(p, latest.get(p.id), images.get(p.id)) for p in props]
 
 
 @router.post("", response_model=PropertyRead, status_code=status.HTTP_201_CREATED)
@@ -98,7 +137,8 @@ def get_property(
     db: Annotated[Session, Depends(get_db)],
 ) -> PropertyRead:
     latest = latest_valuations(db, [prop.id])
-    return _to_read(prop, latest.get(prop.id))
+    images = _images_for(db, [prop.id])
+    return _to_read(prop, latest.get(prop.id), images.get(prop.id))
 
 
 @router.patch("/{property_id}", response_model=PropertyRead)
@@ -157,3 +197,49 @@ def add_valuation(
     db.commit()
     db.refresh(val)
     return val
+
+
+@router.get("/{property_id}/images", response_model=list[PropertyImageRead])
+def list_images(
+    prop: Annotated[Property, Depends(get_owned_property)],
+    db: Annotated[Session, Depends(get_db)],
+) -> list[PropertyImageRead]:
+    images = _images_for(db, [prop.id]).get(prop.id, [])
+    return [PropertyImageRead(id=i.id, url=_image_url(i.storage_path)) for i in images]
+
+
+@router.post(
+    "/{property_id}/images", response_model=PropertyImageRead, status_code=status.HTTP_201_CREATED
+)
+def attach_image(
+    payload: ImageAttach,
+    prop: Annotated[Property, Depends(get_owned_property)],
+    db: Annotated[Session, Depends(get_db)],
+) -> PropertyImageRead:
+    # The file itself is uploaded client-side straight to Supabase Storage; here
+    # we just record its object key against the property. Path must live under
+    # this property's folder so one owner can't attach another's uploaded object.
+    if not payload.storage_path.startswith(f"{prop.id}/"):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "storage_path must be under the property folder")
+    count = db.scalar(
+        select(func.count()).select_from(PropertyImage).where(PropertyImage.property_id == prop.id)
+    )
+    img = PropertyImage(property_id=prop.id, storage_path=payload.storage_path, sort_order=count or 0)
+    db.add(img)
+    db.commit()
+    db.refresh(img)
+    return PropertyImageRead(id=img.id, url=_image_url(img.storage_path))
+
+
+@router.delete(
+    "/{property_id}/images/{image_id}", status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_image(
+    image_id: uuid.UUID,
+    prop: Annotated[Property, Depends(get_owned_property)],
+    db: Annotated[Session, Depends(get_db)],
+) -> None:
+    img = db.get(PropertyImage, image_id)
+    if img is not None and img.property_id == prop.id:
+        db.delete(img)  # storage object left in place — prototype; cleanup is a v2 job
+        db.commit()

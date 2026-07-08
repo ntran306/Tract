@@ -45,12 +45,16 @@ export function Header() {
         <nav className="flex items-center gap-1">
           <NavLink to="/" className={navClass} end>
             <House size={15} />
-            Home
+            <span className="nav-label" data-text="Home">
+              Home
+            </span>
           </NavLink>
           {session && (
             <NavLink to="/manage" className={navClass}>
               <LayoutDashboard size={15} />
-              Manage
+              <span className="nav-label" data-text="Manage">
+                Manage
+              </span>
             </NavLink>
           )}
         </nav>

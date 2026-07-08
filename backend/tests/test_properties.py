@@ -71,6 +71,27 @@ def test_manual_valuation_becomes_latest(client):
     assert prop["latest_value_source"] == "manual"
 
 
+def test_attach_and_list_images(client):
+    pid = client.post(BASE, json=RENTAL).json()["id"]
+    res = client.post(f"{BASE}/{pid}/images", json={"storage_path": f"{pid}/photo1.jpg"})
+    assert res.status_code == 201
+    assert res.json()["url"].endswith(f"property-images/{pid}/photo1.jpg")
+
+    prop = client.get(f"{BASE}/{pid}").json()
+    assert len(prop["images"]) == 1
+
+    img_id = res.json()["id"]
+    assert client.delete(f"{BASE}/{pid}/images/{img_id}").status_code == 204
+    assert client.get(f"{BASE}/{pid}").json()["images"] == []
+
+
+def test_image_path_must_be_under_property_folder(client):
+    pid = client.post(BASE, json=RENTAL).json()["id"]
+    # a path outside this property's folder is rejected (can't claim others' uploads)
+    res = client.post(f"{BASE}/{pid}/images", json={"storage_path": "someone-else/photo.jpg"})
+    assert res.status_code == 400
+
+
 def test_other_users_cannot_see_property(client, as_other_user):
     pid = client.post(BASE, json=RENTAL).json()["id"]
     as_other_user()

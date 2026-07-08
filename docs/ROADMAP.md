@@ -36,6 +36,8 @@ merge to `qa` as a review gate, `prod` deploys.
 - Resend integration: `notify_unread` mirroring worker, monthly digest, settings
   opt-outs.
 - Settings (account/appearance/notifications), profile page, About page.
+  Appearance tab: theme choice + **animations on/off toggle** (data-motion
+  mechanism already in globals.css; wire MotionProvider + control here).
 - Admin page: users, flags, waitlist. Premium waitlist cards live.
 - Deploy: Vercel (frontend), Render (backend), `tract-prod` Supabase project.
 

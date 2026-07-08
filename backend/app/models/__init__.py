@@ -11,6 +11,7 @@ from app.models.enums import (
     ValuationSource,
 )
 from app.models.finance import PropertyValuation, Transaction
+from app.models.image import PropertyImage
 from app.models.market import MarketFMR, MarketHPI
 from app.models.marketplace import Listing
 from app.models.messaging import Conversation, ConversationParticipant, Message, Notification
@@ -34,6 +35,7 @@ __all__ = [
     "PremiumWaitlist",
     "Profile",
     "Property",
+    "PropertyImage",
     "PropertyKind",
     "PropertyStatus",
     "PropertyValuation",

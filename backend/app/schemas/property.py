@@ -42,6 +42,15 @@ class PropertyUpdate(PropertyBase):
     status: PropertyStatus | None = None
 
 
+class PropertyImageRead(BaseModel):
+    id: uuid.UUID
+    url: str  # public URL, built by the router from SUPABASE_URL + storage_path
+
+
+class ImageAttach(BaseModel):
+    storage_path: str = Field(min_length=1, max_length=400)
+
+
 class PropertyRead(PropertyBase):
     model_config = ConfigDict(from_attributes=True)
 
@@ -52,6 +61,7 @@ class PropertyRead(PropertyBase):
     # Latest valuation, attached by the router so the Owned grid needs one call
     latest_value: Decimal | None = None
     latest_value_source: ValuationSource | None = None
+    images: list[PropertyImageRead] = []
 
 
 class ValuationCreate(BaseModel):

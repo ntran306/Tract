@@ -16,7 +16,7 @@ dialogs, tabs. Recharts for charts.
 /manage/owned         Property grid; kind filter tabs: All · My Home · Rentals · Airbnb · Flips · Other
 /manage/owned/:id     Property detail — tabs: Overview · Transactions · Analytics · Lease(rental only)
 /profile              Public-ish profile card
-/settings             Tabs: Account · Appearance · Notifications
+/settings             Tabs: Account · Appearance (theme + animations toggle) · Notifications
 /admin                Dev-only: users table, feature flags, waitlist counts
 ```
 
@@ -145,8 +145,15 @@ Icons come from **lucide-react** (16–18 px, default stroke). Rules:
 - Charts animate once on mount (400ms), never on data refetch.
 - No scroll-triggered animation, no parallax, no skeleton shimmer loops (static
   skeletons are fine).
-- `prefers-reduced-motion: reduce` disables all non-essential motion — enforced via
-  a Tailwind variant used on every animated class.
+- `prefers-reduced-motion: reduce` disables all non-essential motion — enforced
+  globally in globals.css.
+- **User motion toggle (Settings → Appearance, M4):** a switch lets users turn
+  animations off for a flatter, static view, independent of the OS setting. The
+  CSS mechanism already exists — `data-motion="off"` on `<html>` neutralizes all
+  animations/transitions (mirrors the reduced-motion rules). M4 wires a
+  `MotionProvider` (localStorage `tract-motion`, default `on`) plus an inline
+  pre-paint script like the theme one, and the toggle control. Choices: `on`
+  (default, the sanctioned animations) / `off` (static).
 
 ### Accessibility floor (non-negotiable)
 

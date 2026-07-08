@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Trash2 } from 'lucide-react'
+import { AlertTriangle, Plus, ShieldAlert, Trash2, X } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
@@ -134,29 +134,42 @@ export function OverviewTab({ property }: { property: Property }) {
         )}
       </Card>
 
-      <Card className="lg:col-span-2">
-        <h2 className="mb-2 font-display text-base font-semibold text-negative">Danger zone</h2>
+      <Card className="border-negative/40 lg:col-span-2">
+        <h2 className="mb-3 flex items-center gap-2 font-display text-base font-semibold text-negative">
+          <ShieldAlert size={18} />
+          Danger zone
+        </h2>
         {confirmDelete ? (
-          <div className="flex items-center gap-3">
-            <p className="text-sm text-text-muted">
-              This permanently deletes the property and all its transactions and value history.
+          <div className="flex flex-col gap-3 rounded-lg bg-negative/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex items-start gap-2 text-sm text-text-muted">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-negative" />
+              This permanently deletes the property and all its transactions, value
+              history, and photos. This can't be undone.
             </p>
-            <Button
-              variant="secondary"
-              className="border-negative text-negative hover:bg-negative/10"
-              onClick={handleDelete}
-              disabled={deleteProperty.isPending}
-            >
-              <Trash2 size={16} />
-              Delete permanently
-            </Button>
-            <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
-              Cancel
-            </Button>
+            <div className="flex shrink-0 gap-2">
+              <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
+                <X size={16} />
+                Keep it
+              </Button>
+              <Button
+                variant="secondary"
+                className="border-negative bg-negative/10 text-negative hover:bg-negative/20"
+                onClick={handleDelete}
+                disabled={deleteProperty.isPending}
+              >
+                <Trash2 size={16} />
+                Delete permanently
+              </Button>
+            </div>
           </div>
         ) : (
-          <Button variant="ghost" className="text-negative" onClick={() => setConfirmDelete(true)}>
-            Delete this property…
+          <Button
+            variant="secondary"
+            className="border-negative/40 text-negative hover:bg-negative/10"
+            onClick={() => setConfirmDelete(true)}
+          >
+            <Trash2 size={16} />
+            Delete this property
           </Button>
         )}
       </Card>

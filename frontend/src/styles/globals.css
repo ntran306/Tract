@@ -73,6 +73,23 @@ h3 {
   transform: scaleX(1);
 }
 
+/* Reserve the bold width so switching a label from 400 to 500 weight on select
+   never reflows its neighbors (the "resizing tabs" bug). The invisible ghost is
+   always the bold width; the visible text sits at whatever weight is active. */
+.nav-label {
+  display: inline-block;
+}
+
+.nav-label::after {
+  content: attr(data-text);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: 500;
+  pointer-events: none;
+}
+
 /* Simple entrance for popovers/dropdowns — one of the few sanctioned animations. */
 @keyframes pop-in {
   from {
@@ -85,7 +102,9 @@ h3 {
   }
 }
 
-/* Minimal-motion contract: default transitions are short; reduced motion kills them. */
+/* Minimal-motion contract: default transitions are short; reduced motion kills
+   them. Two triggers — the OS preference, and the user's in-app choice
+   (data-motion="off" set from Settings, wired in M4). Same effect either way. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -94,4 +113,12 @@ h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }

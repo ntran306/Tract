@@ -8,11 +8,22 @@ export function PropertyCard({ property }: { property: Property }) {
   const Icon = meta.icon
   const place = [property.city, property.state].filter(Boolean).join(', ')
 
+  const hero = property.images[0]
+
   return (
     <Link
       to={`/manage/owned/${property.id}`}
-      className="block rounded-[10px] border border-border bg-surface p-5 transition-colors duration-150 hover:border-primary"
+      className="block overflow-hidden rounded-[10px] border border-border bg-surface transition-colors duration-150 hover:border-primary"
     >
+      {hero && (
+        <img
+          src={hero.url}
+          alt={property.nickname}
+          loading="lazy"
+          className="h-36 w-full object-cover"
+        />
+      )}
+      <div className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-display text-base font-semibold text-text">
@@ -37,6 +48,7 @@ export function PropertyCard({ property }: { property: Property }) {
         ) : (
           <p className="text-sm text-text-muted">No value recorded yet</p>
         )}
+      </div>
       </div>
     </Link>
   )

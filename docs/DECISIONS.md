@@ -49,6 +49,26 @@ analytics functions) enabled only when a key is configured, behind a feature fla
 multi-currency in v1. The app is honest about what it can't fetch legally/freely:
 users type it in, and the UI treats good manual entry as a feature, not a gap.
 
+**D12 — Property photos: owner uploads to a public Storage bucket (prototype).**
+`property_images` table + Supabase Storage bucket `property-images` (migration
+004). Files upload client-side straight to Storage (bytes never touch the API);
+the API records the object key and builds public URLs. Bucket is PUBLIC for
+prototype simplicity — house exterior photos are low-sensitivity. Hardening to a
+private bucket with signed URLs + per-owner read policies, and deleting storage
+objects on image/property delete (currently orphaned), are v2 items.
+
+**D13 — User animation toggle lives in Settings (M4), mechanism ready now.**
+`data-motion="off"` on <html> neutralizes all animation/transition (globals.css),
+mirroring reduced-motion. Lets users pick the polished animated view or a flat
+static one. Full wiring (MotionProvider + control + pre-paint script) is M4;
+groundwork landed early so it's a small addition.
+
+**D14 — Three demo accounts for prototyping.** Seeded via
+backend/scripts/seed_demo.py (idempotent): Alex Rivera (5-property portfolio),
+Sam Chen (rents out one condo, rents where he lives), Jordan Lee (just a home).
+Emails are +aliases of the owner's gmail (Supabase rejects example.com), shared
+password documented with the script. Re-running wipes and reseeds their data.
+
 **D11 — Maps: Leaflet + OSM, not Google; imagery: owner uploads, never scraped.**
 Google Maps requires a credit-card billing account even at free-tier usage —
 wrong default for this project; Leaflet + OpenStreetMap costs $0 with no key

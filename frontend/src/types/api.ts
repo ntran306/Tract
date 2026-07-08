@@ -43,6 +43,7 @@ export interface Property {
   created_at: string
   latest_value: string | null
   latest_value_source: ValuationSource | null
+  images: PropertyImage[]
 }
 
 export interface PropertyCreatePayload {
@@ -164,4 +165,9 @@ export interface PortfolioSummary {
   cash_flow_month: string
   series: MonthCashFlow[]
   properties: PortfolioPropertyRow[]
+}
+
+export interface PropertyImage {
+  id: string
+  url: string
 }
