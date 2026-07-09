@@ -1,17 +1,23 @@
 import type { FormEvent } from 'react'
-import { Save, Trash2 } from 'lucide-react'
+import { Save, Scale, Trash2 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { useDeleteLease, useLease, useUpsertLease } from './queries'
+import type { Property } from '../../types/api'
+import { useDeleteLease, useLease, useRentBenchmark, useUpsertLease } from './queries'
 
 const field = 'flex flex-col gap-1 text-sm'
 const label = 'text-text-muted'
 
-export function LeaseTab({ propertyId }: { propertyId: string }) {
+export function LeaseTab({ propertyId, property }: { propertyId: string; property: Property }) {
   const { data: lease, isLoading } = useLease(propertyId, true)
   const upsert = useUpsertLease(propertyId)
   const remove = useDeleteLease(propertyId)
+  const { data: benchmark } = useRentBenchmark(
+    property.state,
+    property.beds,
+    lease?.rent ?? null,
+  )
 
   if (isLoading) return null
 
@@ -38,8 +44,22 @@ export function LeaseTab({ propertyId }: { propertyId: string }) {
       <p className="mb-4 text-sm text-text-muted">
         {lease
           ? 'Editing updates the active lease in place.'
-          : 'Rent amount + dates power the cash-flow and FMR benchmarks in M2.'}
+          : 'Rent amount + dates power the cash-flow and rent benchmarks.'}
       </p>
+
+      {benchmark && (
+        <div className="mb-4 flex items-start gap-2 rounded-lg bg-primary-soft p-3 text-sm">
+          <Scale size={16} className="mt-0.5 shrink-0 text-primary" />
+          <span>
+            This rent is{' '}
+            <span className="font-medium">
+              {Math.abs(Number(benchmark.delta_pct))}%{' '}
+              {Number(benchmark.delta_pct) >= 0 ? 'above' : 'below'}
+            </span>{' '}
+            the HUD fair-market rent for {benchmark.area_name} ({benchmark.bedrooms}BR).
+          </span>
+        </div>
+      )}
 
       <form onSubmit={submit} className="flex flex-col gap-3">
         <div className={field}>

@@ -49,6 +49,22 @@ analytics functions) enabled only when a key is configured, behind a feature fla
 multi-currency in v1. The app is honest about what it can't fetch legally/freely:
 users type it in, and the UI treats good manual entry as a feature, not a gap.
 
+**D15 — FHFA HPI = free state-level value estimates; FMR = rent benchmark.**
+`workers/jobs/refresh_hpi.py` pulls the FHFA monthly master CSV (free, no key) at
+`fhfa.gov/hpi/download/monthly/hpi_master.csv`, filtering to
+traditional/all-transactions/quarterly State rows (index_nsa) into market_hpi.
+Estimate = purchase_price × latest_index / index_at_purchase_quarter, rounded to
+$1,000, stored as source='hpi_estimate' — never clobbers a newer manual value.
+FMR (`refresh_fmr.py`, HUD /fmr/statedata, needs free HUD_API_TOKEN) powers the
+rent-vs-FMR chip, which stays hidden (endpoint 404s) until the token/worker run.
+Both scheduled in .github/workflows/cron-market.yml (needs DATABASE_URL +
+HUD_API_TOKEN repo secrets).
+
+**D16 — Config loads backend/.env by absolute path.** pydantic-settings resolved
+`.env` relative to CWD, so workers run from the repo root fell back to the
+localhost default DB. config.py now points env_file at an absolute
+`backend/.env`; CI/prod still override via real env vars.
+
 **D12 — Property photos: owner uploads to a public Storage bucket (prototype).**
 `property_images` table + Supabase Storage bucket `property-images` (migration
 004). Files upload client-side straight to Storage (bytes never touch the API);

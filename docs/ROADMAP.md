@@ -18,12 +18,15 @@ merge to `qa` as a review gate, `prod` deploys.
 - Manage layout (sidebar), Owned grid with kind tabs, empty states.
 
 ## M2 — Analytics (the product is worth using)
-- `services/analytics.py`: cash flow, NOI, cap rate, cash-on-cash, expense
-  breakdown, trends (uses .claude/skills/real-estate-finance definitions).
-- Summary page with charts; property Analytics tab; My Home cost-of-ownership +
-  rent-vs-own.
-- Workers + data: `refresh_hpi` (FHFA) and `refresh_fmr` (HUD) jobs, market
-  endpoints, HPI-based value estimates, FMR benchmark chips.
+- [x] `services/analytics.py`: portfolio totals, equity, 12-month cash-flow
+  series, per-property rows (.claude/skills/real-estate-finance definitions).
+- [x] Summary page with stat cards + cash-flow BarChart + property table.
+- [x] Workers + data: `refresh_hpi` (FHFA, loaded — 10.4k rows / 51 states),
+  `refresh_fmr` (HUD, built; dormant until HUD_API_TOKEN), `/market` endpoints,
+  HPI-based value estimates (POST /properties/{id}/hpi-estimate + Overview
+  button), FMR rent-benchmark chip (self-activates when FMR data lands).
+- [ ] Remaining polish: per-property Analytics tab (NOI, cap rate,
+  cash-on-cash, expense donut); My Home cost-of-ownership + rent-vs-own view.
 
 ## M3 — Messaging + assistant
 - Conversations/messages API, RLS, Supabase Realtime subscription.

@@ -85,7 +85,7 @@ export function PropertyDetailPage() {
         </Tabs.Content>
         {property.kind === 'rental' && (
           <Tabs.Content value="lease">
-            <LeaseTab propertyId={property.id} />
+            <LeaseTab propertyId={property.id} property={property} />
           </Tabs.Content>
         )}
       </Tabs.Root>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, Plus, ShieldAlert, Trash2, X } from 'lucide-react'
+import { AlertTriangle, Plus, ShieldAlert, Sparkles, Trash2, X } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
@@ -10,7 +10,7 @@ import { dateShort, todayLocal } from '../../lib/format'
 import type { Property } from '../../types/api'
 import { SOURCE_LABELS } from './kinds'
 import { ValueChart } from './ValueChart'
-import { useAddValuation, useDeleteProperty, useValuations } from './queries'
+import { useAddValuation, useDeleteProperty, useHpiEstimate, useValuations } from './queries'
 
 function Fact({ label, value }: { label: string; value: string | number | null }) {
   if (value === null || value === '' || value === undefined) return null
@@ -25,9 +25,22 @@ function Fact({ label, value }: { label: string; value: string | number | null }
 export function OverviewTab({ property }: { property: Property }) {
   const { data: valuations } = useValuations(property.id)
   const addValuation = useAddValuation(property.id)
+  const hpiEstimate = useHpiEstimate(property.id)
   const deleteProperty = useDeleteProperty()
   const navigate = useNavigate()
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [estimateError, setEstimateError] = useState<string | null>(null)
+
+  const canEstimate = Boolean(property.purchase_price && property.purchase_date && property.state)
+
+  async function runEstimate() {
+    setEstimateError(null)
+    try {
+      await hpiEstimate.mutateAsync()
+    } catch {
+      setEstimateError('Not enough market data for this location yet.')
+    }
+  }
 
   async function submitValuation(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -115,6 +128,19 @@ export function OverviewTab({ property }: { property: Property }) {
             Record
           </Button>
         </form>
+
+        {canEstimate && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <Button variant="ghost" onClick={runEstimate} disabled={hpiEstimate.isPending}>
+              <Sparkles size={16} />
+              {hpiEstimate.isPending ? 'Estimating…' : 'Estimate from market index'}
+            </Button>
+            <span className="text-xs text-text-muted">
+              Free FHFA index estimate from your purchase price — not an appraisal.
+            </span>
+          </div>
+        )}
+        {estimateError && <p className="mb-3 text-sm text-text-muted">{estimateError}</p>}
 
         {!valuations || valuations.length === 0 ? (
           <p className="text-sm text-text-muted">

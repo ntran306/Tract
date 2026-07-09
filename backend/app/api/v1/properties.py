@@ -25,6 +25,7 @@ from app.schemas.property import (
     ValuationRead,
 )
 from app.services.analytics import latest_valuations
+from app.services.market_data import store_estimate
 
 router = APIRouter()
 
@@ -196,6 +197,26 @@ def add_valuation(
     db.add(val)
     db.commit()
     db.refresh(val)
+    return val
+
+
+@router.post(
+    "/{property_id}/hpi-estimate",
+    response_model=ValuationRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_hpi_estimate(
+    prop: Annotated[Property, Depends(get_owned_property)],
+    db: Annotated[Session, Depends(get_db)],
+) -> PropertyValuation:
+    # Records an index-based estimate as a valuation. Needs purchase price+date,
+    # a state, and HPI data for that state (populated by the refresh_hpi worker).
+    val = store_estimate(db, prop)
+    if val is None:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "Need purchase price, purchase date, and a state with HPI data to estimate",
+        )
     return val
 
 

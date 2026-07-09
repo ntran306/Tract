@@ -161,3 +161,44 @@ export function usePortfolioSummary() {
     staleTime: 30_000,
   })
 }
+
+export function useHpiEstimate(propertyId: string) {
+  const qc = useQueryClient()
+  const invalidate = useInvalidateProperties()
+  return useMutation({
+    mutationFn: () =>
+      api<Valuation>(`${BASE}/properties/${propertyId}/hpi-estimate`, { method: 'POST' }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['valuations', propertyId] })
+      invalidate(propertyId)
+    },
+  })
+}
+
+export interface RentBenchmark {
+  rent: string
+  fmr: string
+  area_name: string
+  bedrooms: number
+  delta_pct: string
+}
+
+/** Rent vs area FMR. Returns null until HUD FMR data exists (404) so the chip
+ *  simply hides now and lights up automatically once the FMR worker has run. */
+export function useRentBenchmark(state: string | null, bedrooms: number | null, rent: string | null) {
+  const enabled = Boolean(state && bedrooms != null && rent)
+  return useQuery({
+    queryKey: ['rent-benchmark', state, bedrooms, rent],
+    enabled,
+    queryFn: async () => {
+      try {
+        return await api<RentBenchmark>(
+          `${BASE}/market/rent-benchmark?state=${state}&bedrooms=${bedrooms}&rent=${rent}`,
+        )
+      } catch (e) {
+        if ((e as { status?: number }).status === 404) return null
+        throw e
+      }
+    },
+  })
+}
