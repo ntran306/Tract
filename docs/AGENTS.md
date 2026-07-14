@@ -42,6 +42,11 @@ visualization quality**, **ease of use**.
 - [ ] Cross-user isolation test exists for every new resource
 - [ ] Rate limiting before any user-generated-content surface opens (M3/v1.5)
 - [ ] Dependencies: Dependabot + CodeQL enabled on the repo (one-time, free)
+- [ ] Leaked-password protection (HaveIBeenPwned check): **Pro-plan-only** —
+      the linter warning is permanent on free tier and safe to ignore in dev.
+      Enable it (Authentication → Password Protection) if/when tract-prod
+      upgrades to Pro at launch; until then compensate with the 8-char minimum
+      already enforced in the signup form.
 
 ## Data-visualization principles (the DataViz agent's charter)
 
