@@ -49,6 +49,14 @@ analytics functions) enabled only when a key is configured, behind a feature fla
 multi-currency in v1. The app is honest about what it can't fetch legally/freely:
 users type it in, and the UI treats good manual entry as a feature, not a gap.
 
+**D17 — Supabase linter flagged alembic_version; RLS now on every table.**
+Alembic creates its own version table outside our migrations, so migration 002
+missed it — Supabase flagged it as publicly writable (12 Jul 2026). Migration
+005 enables RLS (no policies = client deny-all; Alembic bypasses as owner).
+Lesson: after any migration, verify zero rows from
+`select tablename from pg_tables where schemaname='public' and not rowsecurity`.
+Multi-agent workflow + security checklist now codified in docs/AGENTS.md.
+
 **D15 — FHFA HPI = free state-level value estimates; FMR = rent benchmark.**
 `workers/jobs/refresh_hpi.py` pulls the FHFA monthly master CSV (free, no key) at
 `fhfa.gov/hpi/download/monthly/hpi_master.csv`, filtering to
